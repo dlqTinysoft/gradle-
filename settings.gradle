@@ -1,0 +1,3 @@
+//用来管理多项目名称的
+rootProject.name = 'todo'
+

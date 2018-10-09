@@ -1,0 +1,62 @@
+group 'com.imooc.gradle'
+version '1.0-SNAPSHOT'
+
+//插件，也可以编辑自己的插件
+apply plugin: 'java'
+apply plugin: 'war' //官方网站去找
+
+sourceCompatibility = 1.8
+
+//当有多个仓库时，是按顺序来查找
+repositories {
+    mavenCentral()//公共仓库
+    //mavenLocal() 本地仓库加载jar包
+    //自定义maven仓库,公司都使用这个仓库
+    //文件仓库
+    //将这个私服放到第一个位置，就可以了
+   /* maven{
+        url ''
+    }*/
+}
+
+//解决版本冲突问题
+//版本冲突后，直接构建失败
+/*configurations.all{
+    ResolutionStrategy{
+        failOnVersionConflict()
+
+    }
+}*/
+//complile runtime
+//testCompile testRuntime
+dependencies {
+    compile 'org.hibernate:hibernate-core:3.6.3.Final'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//自定义tasks，完成自动创建目录结构的功能
+//执行之前，确定执行顺序
+//钩子方法的作用
+def createDir = {
+    path->
+        File dir = new File(path);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+}
+
+task makeJavaDir(){
+    def paths = ['src/main/java/','src/main/resources','src/test/java','src/test/resources']
+    doFirst {
+        paths.forEach(createDir);
+    }
+}
+
+
+task makeWebDir(){
+    dependsOn 'makeJavaDir'
+    def paths = ['src/main/webapp','src/test/webapp'];
+     doLast{
+         paths.forEach(createDir);
+     }
+}
